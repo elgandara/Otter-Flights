@@ -1,5 +1,6 @@
 package edu.csumb.gand4052.otterflights;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -48,32 +49,64 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
             EditText passwordEditText = (EditText) findViewById(R.id.password_edit_text);
 
             if (this.action.equals("create") ) {
-                Log.d("create", "Account possibly created...");
+
                 String username = usernameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
+                Log.d("debug", "Username: " + username);
+                Log.d("debug", "Password: " + password);
+                Log.d("debug", "isUsernameValid: " + isWordValid(username) );
+                Log.d("debug", "isPasswordValid: " + isWordValid(password) );
 
-                boolean isValidAccount = false;
-
-
-
-                if (!db.isUser(username) ) {
+                if (db.isUser(username) ) {
+                    // TODO: Notify the user the chosen username already exists
+                }
+                else if (isWordValid(username) && isWordValid(password) ) {
                     db.addUser(new User(username, password, "C"));
+                    Log.d("debug", "User has been added.");
 
                     // TODO: Display success dialog
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(R.string.create_success_message);
+
+                    // Set the positive and negative buttons
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+
+                    // Create the alert dialog
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 else {
-                    if (hasSignInFailed) {
-                        // TODO: Dsiplay and alert
 
-
-                        // Send user back to main menu
-                        Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
-                        startActivity(intent);
-                    }
-                    else {
-                        hasSignInFailed = true;
-                    }
                 }
+                // If this is the second attempt, the user is sent to the main menu
+                if (hasSignInFailed) {
+                    // TODO: Dsiplay an alert
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(R.string.create_fail_message);
+
+                    // Set the positive and negative buttons
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+
+                    // Create the alert dialog
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                    // Send user back to main menu
+                    Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
+                    startActivity(intent);
+                }
+                // The sign in has failed if the activity reaches this point
+                hasSignInFailed = true;
             }
             else if (this.action.equals("reserve") ) {
 
@@ -112,5 +145,12 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
         else if (this.action.equals("manage") ) {
             titleTextView.setText("Admin Sign In");
         }
+    }
+
+    // Returns true if the word contains at least one special character,
+    // one number, one uppercase, and one lowercase letter
+    private boolean isWordValid(String word) {
+        // Log.d("regex", "isWordValid: " + word.matches(".*[\\w\\$\\@\\!\\#].*") );
+        return (word.matches(".*[\\w\\$\\@\\!\\#].*") );
     }
 }

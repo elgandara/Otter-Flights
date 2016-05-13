@@ -1,6 +1,8 @@
 package edu.csumb.gand4052.otterflights;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,7 @@ import java.util.Set;
 public class HomeScreenActivity extends AppCompatActivity implements OnClickListener{
 
     MySQLiteHelper db = new MySQLiteHelper(this);
+    HashMap<String, User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,23 +34,11 @@ public class HomeScreenActivity extends AppCompatActivity implements OnClickList
         cancelButton.setOnClickListener(this);
         systemManageButton.setOnClickListener(this);
 
-        // Create an admin user if it does not already exist
-        if (!db.isUser("!admiM2") ) {
-            db.addUser(new User("!admiM2", "!admiM2", "admin"));
-        }
-
-        HashMap<String, User> users = db.getUsers();
-        Set<String> keys = users.keySet();
-
-        logUsers(keys, users);
-
-        db.removeUser("elgandara");
+        initializeDB();
         users = db.getUsers();
-        keys = users.keySet();
 
-        logUsers(keys, users);
-
-
+        Log.d("space", "-------------------------------------------------");
+        logUsers(users.keySet(), users);
     }
 
     @Override
@@ -76,6 +67,22 @@ public class HomeScreenActivity extends AppCompatActivity implements OnClickList
     public void logUsers(Set<String> keys, HashMap<String, User> users) {
         for (String key : keys) {
             Log.d("user", users.get(key).toString() );
+        }
+    }
+
+    private void initializeDB() {
+        // Create users if they does not already exist
+        if (!db.isUser("!admiM2") ) {
+            db.addUser(new User("!admiM2", "!admiM2", "A"));
+        }
+        if (!db.isUser("A@lice5") ) {
+            db.addUser(new User("A@lice5", "@cSit100", "C") );
+        }
+        if (!db.isUser("$BriAn7") ) {
+            db.addUser(new User("$BriAn7", "123aBc##", "C") );
+        }
+        if (!db.isUser("!chriS12!") ) {
+            db.addUser(new User("!chriS12!", "CHrIS12!!", "C") );
         }
     }
 }

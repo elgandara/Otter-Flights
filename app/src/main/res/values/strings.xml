@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Otter Flights</string>
+    <string name="app_name">Otter Airways</string>
     <string name="app_title">Otter Flights Reservation System</string>
     <string name="create_account">Create Account</string>
     <string name="reserve_flight_button_text">Reserve Flight</string>
@@ -9,4 +9,7 @@
     <string name="action_status">Action Status</string>
     <string name="username_text">Username</string>
     <string name="password_text">Password</string>
+    <string name="ok">Ok</string>
+    <string name="create_success_message">Account successfully created!</string>
+    <string name="create_fail_message">Failed to create an account.</string>
 </resources>

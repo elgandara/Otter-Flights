@@ -44,6 +44,12 @@ public class Reservation {
     public Integer getTicketQuantity() {return this.ticketQuantity;}
      public String getTime() {return this.time;}
 
+     public void setId(Integer id) {this.id = id;}
+     public void setUsername(String username) {this.username = username;}
+     public void setFlightNumber(String flightNumber) {this.flightNumber = flightNumber;}
+     public void setDepartureLocation(String departureLocation) {this.departureLocation = departureLocation;}
+     public void setArrivalLocation(String arrivalLocation) {this.arrivalLocation = arrivalLocation;}
+
     public boolean equals(Object object) {
         if (object instanceof Transaction) {
             Reservation reservation = (Reservation) object;

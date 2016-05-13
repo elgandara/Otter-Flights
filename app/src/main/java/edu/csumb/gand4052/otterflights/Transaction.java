@@ -49,6 +49,14 @@ public class Transaction {
     public Integer getTicketQuantity() {return this.ticketQuantity;}
     public String getTime() {return this.time;}
 
+    public void setId(Integer id) {this.id = id;}
+    public void seType(String type) {this.type = type;}
+    public void setUsername(String username) {this.username = username;}
+    public void setFlightNumber(String flightNumber) {this.flightNumber = flightNumber;}
+    public void setDepartureLocation(String departureLocation) {this.departureLocation = departureLocation;}
+    public void setArrivalLocation(String arrivalLocation) {this.arrivalLocation = arrivalLocation;}
+    public void setTicketQuantity(Integer ticketQuantity) {this.ticketQuantity = ticketQuantity;}
+
     public boolean equals(Object object) {
         if (object instanceof Transaction) {
             Transaction transaction = (Transaction) object;

@@ -118,7 +118,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // Get a writable database
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String query = "SELECT username FROM " + TABLE_USER + " WHERE username = '?' ";
+        //Log.d("isUser", "Username: " + username);
+        String query = "SELECT username FROM " + TABLE_USER + " WHERE username = ? ";
         String[] whereArgs = {username};
         Cursor cursor = db.rawQuery(query, whereArgs);
 
@@ -219,11 +220,24 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private String time;
      */
 
-    public Reservation getReservation() {
+    public Reservation getReservation(Integer id) {
+
+        String query = "SELECT * FROM reservation WHERE id = ?";
+        String[] whereArgs = {id.toString()};
 
         // Get writeable database
         SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, whereArgs);
 
+        Reservation reservation = new Reservation();
+
+        // Retrieve content from query
+        if (cursor.moveToFirst() ) {
+            do {
+
+
+            } while (cursor.moveToNext() );
+        }
 
 
         return null;
