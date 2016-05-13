@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Otter Flights</string>
+    <string name="app_title">Otter Flights Reservation System</string>
+    <string name="create_account">Create Account</string>
+    <string name="reserve_flight_button_text">Reserve Flight</string>
+    <string name="cancel_reservation_button_text">Cancel Reservation</string>
+    <string name="manage_system_button_text">Manage System</string>
+    <string name="action_button">Action</string>
+    <string name="action_status">Action Status</string>
+    <string name="username_text">Username</string>
+    <string name="password_text">Password</string>
+</resources>
