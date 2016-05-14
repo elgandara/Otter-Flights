@@ -57,10 +57,20 @@ public class HomeScreenActivity extends AppCompatActivity implements OnClickList
 
         }
         else if (id == R.id.cancel_button) {
+            Bundle bundle = new Bundle();
+            bundle.putString("action", "cancel");
 
+            Intent intent = new Intent(HomeScreenActivity.this, LoginActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
         }
         else if (id == R.id.system_manage_button) {
+            Bundle bundle = new Bundle();
+            bundle.putString("action", "manage");
 
+            Intent intent = new Intent(HomeScreenActivity.this, LoginActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
         }
     }
 
@@ -83,6 +93,26 @@ public class HomeScreenActivity extends AppCompatActivity implements OnClickList
         }
         if (!db.isUser("!chriS12!") ) {
             db.addUser(new User("!chriS12!", "CHrIS12!!", "C") );
+        }
+        if (!db.isFlight("Otter101") ) {
+            db.addFlight(new Flight("Otter101", "Monterey", "Los Angeles",
+                         "10:30(AM)", 10, 150.00) );
+        }
+        if (!db.isFlight("Otter102") ) {
+            db.addFlight(new Flight("Otter102", "Los Angeles", "Monterey",
+                    "1:00(PM)", 10, 150.00) );
+        }
+        if (!db.isFlight("Otter201") ) {
+            db.addFlight(new Flight("Otter201", "Monterey", "Seattle",
+                    "11:00(AM)", 5, 200.50) );
+        }
+        if (!db.isFlight("Otter205") ) {
+            db.addFlight(new Flight("Otter205", "Monterey", "Seattle",
+                    "3:45(PM)", 15, 150.00) );
+        }
+        if (!db.isFlight("Otter202") ) {
+            db.addFlight(new Flight("Otter202", "Seattle", "Monterey",
+                    "2:10(PM)", 10, 200.50) );
         }
     }
 }

@@ -13,6 +13,7 @@ public class Transaction {
     private String departureLocation;
     private String arrivalLocation;
     private Integer ticketQuantity;
+    private Double totalAmount;
     private String time;
 
     public Transaction() {
@@ -23,21 +24,8 @@ public class Transaction {
         this.departureLocation = "";
         this.arrivalLocation = "";
         this.ticketQuantity = 0;
+        this.totalAmount = 0.0;
         this.time = "";
-    }
-
-    public Transaction(Integer id, String type, String username,
-                       String flightNumber, String departureLocation,
-                       String arrivalLocation, Integer ticketQuantity,
-                       String time) {
-        this.id = id;
-        this.type = type;
-        this.username = username;
-        this.flightNumber = flightNumber;
-        this.departureLocation = departureLocation;
-        this.arrivalLocation = arrivalLocation;
-        this.ticketQuantity = ticketQuantity;
-        this.time = time;
     }
 
     public Integer getId() {return id;}
@@ -47,15 +35,18 @@ public class Transaction {
     public String getDepartureLocation() {return departureLocation;}
     public String getArrivalLocation() {return arrivalLocation;}
     public Integer getTicketQuantity() {return this.ticketQuantity;}
+    public Double getTotalAmount() {return this.totalAmount;}
     public String getTime() {return this.time;}
 
     public void setId(Integer id) {this.id = id;}
-    public void seType(String type) {this.type = type;}
+    public void setType(String type) {this.type = type;}
     public void setUsername(String username) {this.username = username;}
     public void setFlightNumber(String flightNumber) {this.flightNumber = flightNumber;}
     public void setDepartureLocation(String departureLocation) {this.departureLocation = departureLocation;}
     public void setArrivalLocation(String arrivalLocation) {this.arrivalLocation = arrivalLocation;}
     public void setTicketQuantity(Integer ticketQuantity) {this.ticketQuantity = ticketQuantity;}
+    public void setTotalAmount(Double totalAmount) {this.totalAmount = totalAmount;}
+    public void setTime(String time) {this.time = time;}
 
     public boolean equals(Object object) {
         if (object instanceof Transaction) {

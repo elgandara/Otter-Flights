@@ -27,31 +27,26 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_ACCOUNT_TYPE = "account_type";
     private static final String KEY_LAST_LOGIN = "last_login";
 
-    // Table Name - reservation
-    private static final String TABLE_RESERVATION = "reservation";
-
-    // Columns Names of reservation Table
-    private static final String KEY_RESERVATION_ID = "reservation_id";
-    //private static final String KEY_USERNAME = "username"; <-- Foreign key
-    private static final String KEY_FLIGHT_NUMBER = "flight_number";
-    private static final String KEY_DEPARTURE = "departure_location";
-    private static final String KEY_ARRIVAL = "arrival_location";
-    private static final String KEY_TICKET_QUANTITY = "ticket_quantity";
-    private static final String KEY_TOTAL_AMOUNT = "total_amount";
-
     // Table Name - transaction
-    private static final String TABLE_TRANSACTION = "transaction";
+    private static final String TABLE_TRANSACTION = "_transaction";
 
     // Columns Names of transaction Table
     private static final String KEY_TRANSACTION_ID = "transaction_id";
-    private static final String KEY_TRANSACTION_TYPE = "transaction_type";
-    //private static final String KEY_RESERVATION_ID = "reservation_id";
-    //private static final String KEY_USERNAME = "username" <-- Foreign key
-    //private static final String KEY_FLIGHT_NUMBER = "flight_number"; <-- Foreign key
-    //private static final String KEY_DEPARTURE = "departure_location";
-    //private static final String KEY_ARRIVAL = "arrival_location";
-    //private static final String KEY_TICKET_QUANTITY = "ticket_quantity";
+    private static final String KEY_TRANSACTION_TYPE = "type";
     private static final String KEY_TIMESTAMP = "timestamp";
+    private static final String KEY_TICKET_QUANTITY = "ticket_quantity";
+    private static final String KEY_TOTAL_AMOUNT = "total_amount";
+
+    // Table Name - flight
+    private static final String TABLE_FLIGHT = "flight";
+
+    // Column Names of transaction Table
+    private static final String KEY_FLIGHT_NUMBER = "flight_number";
+    private static final String KEY_DEPARTURE = "departure_location";
+    private static final String KEY_ARRIVAL = "arrival_location";
+    private static final String KEY_DEPARTURE_TIME = "departure_time";
+    private static final String KEY_CAPACITY = "flight_capacity";
+    private static final String KEY_TICKET_PRICE = "price";
 
     // Database Version
     private static final int DATABASE_VERSION = 1;
@@ -73,6 +68,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 "account_type TEXT, " +
                 "last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP );";
 
+        /*
         // SQL statement to create a table called "reservation"
         String CREATE_RESERVATION_TABLE = "CREATE TABLE IF NOT EXISTS reservation( " +
                 "reservation_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -83,22 +79,41 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 "ticket_quantity INTEGER, " +
                 "total_amount REAL, " +
                 "time TIMESTAMP DEFAULT CURRENT_TIMESTAMP );";
+        */
 
         // SQL statement to create a table called "transaction"
-        String CREATE_TRANSACTION_TABLE = "CREATE TABLE IF NOT EXISTS transaction( " +
+        String CREATE_TRANSACTION_TABLE = "CREATE TABLE IF NOT EXISTS _transaction( " +
                 "transaction_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "transaction_type TEXT, " +
+                "type TEXT," +
+                "username TEXT, " +
+                "flight_number TEXT, " +
+                "departure_location TEXT, " +
+                "arrival_location TEXT, " +
+                "ticket_quantity INTEGER, " +
+                "total_amount REAL, " +
                 "time TIMESTAMP DEFAULT CURRENT_TIMESTAMP );";
+
+        // SQL statement to create a table called "flight"
+        String CREATE_FLIGHT_TABLE = "CREATE TABLE IF NOT EXISTS flight( " +
+                "flight_number TEXT PRIMARY KEY, " +
+                "arrival_location TEXT, " +
+                "departure_location TEXT, " +
+                "flight_capacity INTEGER, " +
+                "departure_time TEXT, " +
+                "price REAL);";
 
         // execute an SQL statement to create the user,
         // reservation, and transaction table
         db.execSQL(CREATE_USER_TABLE);
 
         // execute an SQL statement to create the reservation table
-        db.execSQL(CREATE_RESERVATION_TABLE);
+        //db.execSQL(CREATE_RESERVATION_TABLE);
 
         // execute an SQL statement to create the transaction table
-        //db.execSQL(CREATE_TRANSACTION_TABLE);
+        db.execSQL(CREATE_TRANSACTION_TABLE);
+
+        // execute an SQL statement to create the transaction table
+        db.execSQL(CREATE_FLIGHT_TABLE);
     }
 
     @Override
@@ -107,6 +122,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS user");
         db.execSQL("DROP TABLE IF EXISTS reservation");
         db.execSQL("DROP TABLE IF EXISTS transaction");
+        db.execSQL("DROP TABLE IF EXISTS flight");
 
         // create fresh user, reservation, and transaction table
         this.onCreate(db);
@@ -119,7 +135,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         //Log.d("isUser", "Username: " + username);
-        String query = "SELECT username FROM " + TABLE_USER + " WHERE username = ? ";
+        String query = "SELECT username FROM " + TABLE_USER + " WHERE username = ?;";
         String[] whereArgs = {username};
         Cursor cursor = db.rawQuery(query, whereArgs);
 
@@ -128,8 +144,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     public void addUser(User user) {
-        //Log.d(TAG, "addUser() - " + user.toString());
-
         // Get a writable database
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -196,7 +210,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return users;
     }
 
-    public void removeUser(String username) {
+    public void deleteUser(String username) {
 
         // Get a writable database
         SQLiteDatabase db = this.getWritableDatabase();
@@ -209,40 +223,189 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.delete(TABLE_USER, whereClause, whereArgs);
     }
 
+    public void deleteAllUsers() {
+        HashMap<String, User> users = getUsers();
+        for (String key : users.keySet() ) {
+            deleteUser(users.get(key).getUsername() );
+        }
+    }
+
     // -----------------------------------------------------------------------------------
-    /*
-    private Integer id;
-    private String username;
-    private String flightNumber;
-    private String departureLocation;
-    private String arrivalLocation;
-    private Integer ticketQuantity;
-    private String time;
-     */
 
-    public Reservation getReservation(Integer id) {
+    public Transaction getTransaction(Integer id) {
 
-        String query = "SELECT * FROM reservation WHERE id = ?";
+        String query = "SELECT * FROM _transaction WHERE id = ?";
         String[] whereArgs = {id.toString()};
 
         // Get writeable database
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, whereArgs);
 
-        Reservation reservation = new Reservation();
+        Transaction transaction = new Transaction();
 
         // Retrieve content from query
         if (cursor.moveToFirst() ) {
             do {
-
+                // Get the information from the database
+                transaction.setId(cursor.getInt(0) );
+                transaction.setUsername(cursor.getString(1) );
+                transaction.setFlightNumber(cursor.getString(2) );
+                transaction.setDepartureLocation(cursor.getString(3) );
+                transaction.setArrivalLocation(cursor.getString(4) );
+                transaction.setTicketQuantity(cursor.getInt(5) );
 
             } while (cursor.moveToNext() );
         }
 
+        Log.d("transaction", "Id" + transaction.getId().toString() );
+        Log.d("transaction", "Username: " + transaction.getUsername() );
+        Log.d("transaction", "Flight Number: " + transaction.getFlightNumber() );
+        Log.d("transaction", "Departure Location: " + transaction.getDepartureLocation() );
+        Log.d("transaction", "Arrival Location: " + transaction.getArrivalLocation() );
+        Log.d("transaction", "Ticket Quantity: " + transaction.getTicketQuantity().toString() );
 
         return null;
     }
 
+    public ArrayList<Transaction> getTransactions(String type) {
+       ArrayList<Transaction> transactions = new ArrayList<Transaction>();
 
+        // Get writeable database
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor;
 
+        String query = "SELECT * FROM " + TABLE_TRANSACTION + " ";
+
+        if (type.isEmpty() ) {
+            cursor = db.rawQuery(query, null);
+        }
+        else {
+            query += " WHERE type = ? ";
+            String[] whereArgs = {type};
+            cursor = db.rawQuery(query, whereArgs);
+        }
+
+        query += " ORDER BY time desc;";
+
+        // Retrieve content from query
+        if (cursor.moveToFirst() ) {
+            do {
+                Transaction transaction = new Transaction();
+
+                // Get the information from the database
+                transaction.setId(cursor.getInt(0));
+                transaction.setUsername(cursor.getString(1));
+                transaction.setFlightNumber(cursor.getString(2));
+                transaction.setDepartureLocation(cursor.getString(3));
+                transaction.setArrivalLocation(cursor.getString(4));
+                transaction.setTicketQuantity(cursor.getInt(5));
+
+                transaction.setTime(cursor.getString(6) );
+
+                transactions.add(transaction);
+
+            } while (cursor.moveToNext() );
+        }
+
+        // Return reservations
+        return transactions;
+    }
+
+    public void addTransaction(Transaction transaction) {
+
+        // Get a writable database
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create content values
+        ContentValues values = new ContentValues();
+
+        // Set the content values based on the type of transaction
+        if (transaction.getType().equals("New Account") ) {
+            values.put(KEY_TRANSACTION_TYPE, transaction.getType());
+            values.put(KEY_USERNAME, transaction.getUsername());
+        }
+        else {
+            values.put(KEY_TRANSACTION_TYPE, transaction.getType());
+            values.put(KEY_USERNAME, transaction.getUsername());
+            values.put(KEY_FLIGHT_NUMBER, transaction.getFlightNumber());
+            values.put(KEY_DEPARTURE, transaction.getDepartureLocation());
+            values.put(KEY_ARRIVAL, transaction.getArrivalLocation());
+            values.put(KEY_TICKET_QUANTITY, transaction.getTicketQuantity());
+            values.put(KEY_TOTAL_AMOUNT, transaction.getTotalAmount());
+        }
+
+        // Insert the values into the transaction table
+        db.insert(TABLE_TRANSACTION, null, values);
+    }
+
+    public void updateTransaction(Transaction transaction) {
+        // Get a writable database
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create content values
+        ContentValues values = new ContentValues();
+
+        // Set the content values based on the type of transaction
+        if (transaction.getType().equals("New Account") ) {
+            values.put(KEY_TRANSACTION_TYPE, transaction.getType());
+            values.put(KEY_USERNAME, transaction.getUsername());
+        }
+        else {
+            values.put(KEY_TRANSACTION_TYPE, transaction.getType());
+            values.put(KEY_USERNAME, transaction.getUsername());
+            values.put(KEY_FLIGHT_NUMBER, transaction.getFlightNumber());
+            values.put(KEY_DEPARTURE, transaction.getDepartureLocation());
+            values.put(KEY_ARRIVAL, transaction.getArrivalLocation());
+            values.put(KEY_TICKET_QUANTITY, transaction.getTicketQuantity());
+            values.put(KEY_TOTAL_AMOUNT, transaction.getTotalAmount());
+        }
+
+        String whereClause = "WHERE " + KEY_TRANSACTION_ID + " = ?";
+        String[] whereArgs = {transaction.getId().toString()};
+
+        // Insert the values into the transaction table
+        db.update(TABLE_TRANSACTION,values, whereClause, whereArgs);
+    }
+
+    // -----------------------------------------------------------
+    /*
+    private Integer flightNumber;
+    private String departureLocation;
+    private String arrivalLocation;
+    private String departureTime;
+    private Integer flightCapacity;
+    private Double price;
+     */
+    public void addFlight(Flight flight) {
+        // Get writeable database
+        SQLiteDatabase db = getWritableDatabase();
+
+        // Create content values
+        ContentValues values = new ContentValues();
+        values.put(KEY_FLIGHT_NUMBER, flight.getFlightNumber() );
+        values.put(KEY_DEPARTURE, flight.getDepartureLocation() );
+        values.put(KEY_ARRIVAL, flight.getArrivalLocation() );
+        values.put(KEY_DEPARTURE_TIME, flight.getDepartureTime() );
+        values.put(KEY_CAPACITY, flight.getFlightCapacity() );
+        values.put(KEY_TICKET_PRICE, flight.getPrice() );
+
+        db.insert(TABLE_FLIGHT, null, values);
+    }
+
+    public boolean isFlight(String flightNumber) {
+        // Get writeable database
+        SQLiteDatabase db = getWritableDatabase();
+
+        String query = "SELECT flight_number FROM " + TABLE_FLIGHT +
+                       " WHERE flight_number = ? ";
+        String[] whereArgs = {flightNumber};
+        Cursor cursor = db.rawQuery(query, whereArgs);
+
+        return (cursor.getCount() == 1);
+    }
+
+    public ArrayList<Flight> getFlights() {
+
+        return null;
+    }
 }

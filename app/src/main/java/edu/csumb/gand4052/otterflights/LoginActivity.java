@@ -16,9 +16,10 @@ import android.widget.TextView;
 
 public class LoginActivity extends AppCompatActivity implements OnClickListener {
 
-    MySQLiteHelper db;
+    private MySQLiteHelper db;
     private String action;
-    private boolean hasSignInFailed;
+    private int failedAttempts;
+    private boolean isLoginSuccess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,8 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
         setupLayout();
 
         // Initialize activity variables
-        hasSignInFailed = false;
+        failedAttempts = 0;
+        isLoginSuccess = false;
     }
 
     @Override
@@ -45,68 +47,57 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
 
         if (id == R.id.action_button) {
 
+            // Get instance of the input edit texts
             EditText usernameEditText = (EditText) findViewById(R.id.username_edit_text);
             EditText passwordEditText = (EditText) findViewById(R.id.password_edit_text);
 
+
+            String username = usernameEditText.getText().toString();
+            String password = passwordEditText.getText().toString();
+
             if (this.action.equals("create") ) {
 
-                String username = usernameEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
-                Log.d("debug", "Username: " + username);
-                Log.d("debug", "Password: " + password);
-                Log.d("debug", "isUsernameValid: " + isWordValid(username) );
-                Log.d("debug", "isPasswordValid: " + isWordValid(password) );
+                int messageId = 0;
 
                 if (db.isUser(username) ) {
-                    // TODO: Notify the user the chosen username already exists
+                    // Notify the user the chosen username already exists
+                    messageId = R.string.existing_user_message;
+                    failedAttempts++;
                 }
+                // When the user info is valid and the username is available
                 else if (isWordValid(username) && isWordValid(password) ) {
                     db.addUser(new User(username, password, "C"));
-                    Log.d("debug", "User has been added.");
+                    //Log.d("debug", "User has been added.");
 
-                    // TODO: Display success dialog
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage(R.string.create_success_message);
+                    // Display a success dialog and send back to home activity
+                    messageId = R.string.create_success_message;
+                    isLoginSuccess = true;
 
-                    // Set the positive and negative buttons
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
-                            startActivity(intent);
-                        }
-                    });
+                    // Create a new transaction and enter it into the database
+                    Transaction transaction = new Transaction();
+                    transaction.setType("New Account");
+                    transaction.setUsername(username);
 
-                    // Create the alert dialog
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-                else {
-
-                }
-                // If this is the second attempt, the user is sent to the main menu
-                if (hasSignInFailed) {
-                    // TODO: Dsiplay an alert
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage(R.string.create_fail_message);
-
-                    // Set the positive and negative buttons
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
-                            startActivity(intent);
-                        }
-                    });
-
-                    // Create the alert dialog
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                    // Send user back to main menu
-                    Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
-                    startActivity(intent);
+                    // Insert the transaction into the database
+                    db.addTransaction(transaction);
                 }
                 // The sign in has failed if the activity reaches this point
-                hasSignInFailed = true;
+                else {
+                    messageId = R.string.create_failure_message;
+                    failedAttempts++;
+                }
+
+                // If this is the second attempt, the user is sent to the main menu
+                if (failedAttempts > 1 || isLoginSuccess) {
+                    // Display the appropriate failure message
+                    AlertDialog dialog = createAlertDialog(messageId, true);
+                    dialog.show();
+                }
+                // Otherwise, display the error and allow for more input
+                else {
+                    AlertDialog dialog = createAlertDialog(messageId, false);
+                    dialog.show();
+                }
             }
             else if (this.action.equals("reserve") ) {
 
@@ -116,6 +107,42 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
             }
             else if (this.action.equals("manage") ) {
 
+                int messageId = 0;
+
+                if (db.isUser(username) ) {
+
+                    // Get the user info
+                    User user = db.getUser(username);
+
+                    if (password.equals(user.getPassword() ) && user.getAccountType().equals("A") ) {
+                        messageId = R.string.admin_success_message;
+                        isLoginSuccess = true;
+
+                        Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                        startActivity(intent);
+                    }
+                    else {
+                        failedAttempts++;
+                        messageId = R.string.invalid_login_message;
+                    }
+                }
+                else {
+                    failedAttempts++;
+                    messageId = R.string.invalid_login_message;
+                }
+
+
+                // If this is the second attempt, the user is sent to the main menu
+                if (failedAttempts > 1 || isLoginSuccess) {
+                    // Display the appropriate failure message
+                    AlertDialog dialog = createAlertDialog(messageId, true);
+                    dialog.show();
+                }
+                // Otherwise, display the error and allow for more input
+                else {
+                    AlertDialog dialog = createAlertDialog(messageId, false);
+                    dialog.show();
+                }
             }
         }
     }
@@ -151,6 +178,35 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
     // one number, one uppercase, and one lowercase letter
     private boolean isWordValid(String word) {
         // Log.d("regex", "isWordValid: " + word.matches(".*[\\w\\$\\@\\!\\#].*") );
-        return (word.matches(".*[\\w\\$\\@\\!\\#].*") );
+
+        // Make sure there is at leas one capital letter, lowercase letter,
+        // spacial character and number
+        return (word.matches(".*[a-z]+.*") && word.matches(".*[A-Z]+.*") &&
+            word.matches(".*\\d+.*") && word.matches(".*[\\!\\@\\#\\$]+.*") );
+    }
+
+    private AlertDialog createAlertDialog(int messageResourseId, final boolean sendBackToHome) {
+        // Create the alert dialog builder
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(messageResourseId);
+
+        builder.setTitle(R.string.alert_notification_title);
+
+        // Set the positive and negative buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // If the sign in has failed previously, send the user back to
+                if (sendBackToHome) {
+                    //Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
+                    //startActivity(intent);
+                    finish();
+                }
+            }
+        });
+
+        // Create the alert dialog
+        AlertDialog dialog = builder.create();
+
+        return dialog;
     }
 }

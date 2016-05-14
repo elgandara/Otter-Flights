@@ -5,11 +5,24 @@
     <string name="reserve_flight_button_text">Reserve Flight</string>
     <string name="cancel_reservation_button_text">Cancel Reservation</string>
     <string name="manage_system_button_text">Manage System</string>
+
+    <!-- Login Screen string values -->
     <string name="action_button">Action</string>
     <string name="action_status">Action Status</string>
     <string name="username_text">Username</string>
     <string name="password_text">Password</string>
+
+    <!-- Alert Dialog string values -->
     <string name="ok">Ok</string>
     <string name="create_success_message">Account successfully created!</string>
-    <string name="create_fail_message">Failed to create an account.</string>
+    <string name="create_failure_message">Failed to create an account.</string>
+    <string name="alert_notification_title">Notification</string>
+    <string name="existing_user_message">Username choice already exists.</string>
+    <string name="invalid_login_message">Invalid username or input!</string>
+    <string name="admin_success_message">Admin actions performed successfully!</string>
+    <string name="admin_title">Transactions</string>
+    <string name="continue_button_text">Continue</string>
+    <string name="decline">No</string>
+    <string name="accept">Yes</string>
+    <string name="create_flight_text">Add a new flight?</string>
 </resources>

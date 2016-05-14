@@ -11,7 +11,8 @@ public class Reservation {
     private String departureLocation;
     private String arrivalLocation;
     private Integer ticketQuantity;
-     private String time;
+    private Double totalAmount;
+    private String time;
 
     public Reservation() {
         this.id = 0;
@@ -20,20 +21,8 @@ public class Reservation {
         this.departureLocation = "";
         this.arrivalLocation = "";
         this.ticketQuantity = 0;
+        this.totalAmount = 0.0;
         this.time = "";
-    }
-
-    public Reservation(Integer id, String type, String username,
-                       String flightNumber, String departureLocation,
-                       String arrivalLocation, Integer ticketQuantity,
-                       String time) {
-        this.id = id;
-        this.username = username;
-        this.flightNumber = flightNumber;
-        this.departureLocation = departureLocation;
-        this.arrivalLocation = arrivalLocation;
-        this.ticketQuantity = ticketQuantity;
-        this.time = time;
     }
 
     public Integer getId() {return id;}
@@ -42,13 +31,16 @@ public class Reservation {
     public String getDepartureLocation() {return departureLocation;}
     public String getArrivalLocation() {return arrivalLocation;}
     public Integer getTicketQuantity() {return this.ticketQuantity;}
-     public String getTime() {return this.time;}
+    public Double getTotalAmount() {return this.totalAmount;}
+    public String getTime() {return this.time;}
 
-     public void setId(Integer id) {this.id = id;}
-     public void setUsername(String username) {this.username = username;}
-     public void setFlightNumber(String flightNumber) {this.flightNumber = flightNumber;}
-     public void setDepartureLocation(String departureLocation) {this.departureLocation = departureLocation;}
-     public void setArrivalLocation(String arrivalLocation) {this.arrivalLocation = arrivalLocation;}
+    public void setId(Integer id) {this.id = id;}
+    public void setUsername(String username) {this.username = username;}
+    public void setFlightNumber(String flightNumber) {this.flightNumber = flightNumber;}
+    public void setDepartureLocation(String departureLocation) {this.departureLocation = departureLocation;}
+    public void setArrivalLocation(String arrivalLocation) {this.arrivalLocation = arrivalLocation;}
+    public void setTicketQuantity(Integer ticketQuantity) {this.ticketQuantity = ticketQuantity;}
+    public void setTotalAmount(Double totalAmount) {this.totalAmount = totalAmount;}
 
     public boolean equals(Object object) {
         if (object instanceof Transaction) {
